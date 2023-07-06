@@ -7,7 +7,9 @@ import random
 import numpy as np
 import cv2
 
-def CreateDataSets():
+NUM_WORKERS = os.cpu_count()
+
+def create_datasets():
     # Initialize the data sets
     # old way
     """
@@ -26,6 +28,30 @@ def CreateDataSets():
     print('Training Dataset: {} images'.format(len(train_ds)))
     print('Testing Dataset: {} images'.format(len(val_ds)))
     return train_ds, val_ds
+
+def create_dataloaders(
+        train_ds,
+        val_ds,
+        batch_size:int,
+        num_workers:int=NUM_WORKERS,
+    ):
+    # Creates training and testing DataLoaders.
+    train_dataloader = DataLoader(
+        train_ds,
+        batch_size=batch_size,
+        shuffle=True,
+        num_workers=num_workers,
+        pin_memory=True # avoids unnecessary copying of memory between CPU and GPU memory by "pinning" examples that have been seen before,
+    )
+    val_dataloader = DataLoader(
+        val_ds,
+        batch_size=batch_size,
+        shuffle=False,
+        num_workers=num_workers,
+        pin_memory=True,
+    )
+
+    return train_dataloader, val_dataloader
 
 class ISLESDataSet(Dataset):
     def __init__(self, train=True, val=False, preload=False, patid=None, patids=None, max_size=None):
