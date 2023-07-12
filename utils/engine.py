@@ -1,39 +1,78 @@
 import torch
 from tqdm.auto import tqdm
-import time
-import os
 
-def run_iteration(model: torch.nn.Module,
-                  dataloader: torch.utils.data.DataLoader,
-                  loss_fn: torch.nn.Module,
-                  optimizer: torch.optim.Optimizer,
-                  device: torch.device,
-                  do_backprob=True):
-    loss_iter = 0
-    for x, y, pid, sid in dataloader:
-        # Data to device
-        x, y = x.to(device), y.squeeze(dim=1).long().to(device)
+def train_step(model: torch.nn.Module,
+               dataloader: torch.utils.data.DataLoader,
+               loss_fn: torch.nn.Module,
+               optimizer: torch.optim.Optimizer,
+               device: torch.device):
+    # Put model in train mode
+    model.train()
 
-        # 1. Forward pass
-        y_logits = model(x) #.squeeze()
-        y_pred = y_logits.softmax(dim=1).argmax(dim=1)
+    # Setup the train loss and train accuracy values
+    train_loss, train_acc = 0, 0
 
-        #print(f"y_logits dtype: {y_logits.dtype} | y_true dtype: {y.dtype}")
-        #print(f"y_logits shape: {y_logits.shape} | y_true shape: {y.shape}")
-        # 2. Calculate the loss
-        loss = loss_fn(y_logits, y)
+    # Loop through DataLoader batches
+    for batch, (img, label) in enumerate(dataloader):
+        # Send data to target device
+        img, label = img.to(device), label.to(device)
 
-        if do_backprob:
-            # 3. Optimizer zero grad
-            optimizer.zero_grad()
-            # 4. Loss backward
-            loss.backward()
-            # 5. Optimizer step
-            optimizer.step()
+        # 1. Forward pass, make predictions (logits)
+        pred_logits = model(img)
 
-        loss_iter += loss.item()
+        # 2. Calculate and accumulate loss across all batches
+        loss = loss_fn(pred_logits, label)
+        train_loss += loss.item()
 
-    return loss_iter/len(dataloader)
+        # 3. Optimizer zero grad
+        optimizer.zero_grad()
+
+        # 4. Loss backward
+        loss.backward()
+
+        # 5. Optimizer step
+        optimizer.step()
+
+        # Calculate and accumalate accuracy across all batches
+        pred = pred_logits.softmax(dim=1).argmax(dim=1)
+        train_acc += pred.eq(label).sum().item()/len(label)
+
+    # Adjust metrics to get average loss and accuracy per batch 
+    train_loss /= len(dataloader)
+    train_acc /= len(dataloader)
+    return train_loss, train_acc
+
+def test_step(model: torch.nn.Module,
+              dataloader: torch.utils.data.DataLoader,
+              loss_fn: torch.nn.Module,
+              device: torch.device):
+    # Put model in eval mode
+    model.eval()
+    # Setup the test loss and test accuracy values
+    test_loss, test_acc = 0, 0
+
+    # Turn on inference context manager
+    with torch.inference_mode():
+        # Loop through DataLoader batches
+        for batch, (img, label) in enumerate(dataloader):
+            # Send data to target device
+            img, label = img.to(device), label.to(device)
+
+            # 1. Forward pass, make predictions (logits)
+            pred_logits = model(img)
+
+            # 2. Calculate and accumulate loss across all batches
+            test_loss += loss_fn(pred_logits, label).item()
+
+            # Calculate and accumulate accuracy across all batches
+            pred = pred_logits.softmax(dim=1).argmax(dim=1)
+            test_acc += pred.eq(label).sum().item()/len(label)
+
+        # Adjust metrics to get average loss and accuracy per batch
+        test_loss /= len(dataloader)
+        test_acc /= len(dataloader)
+
+    return test_loss, test_acc
 
 def train(model: torch.nn.Module,
           train_dataloader: torch.utils.data.DataLoader,
@@ -42,57 +81,44 @@ def train(model: torch.nn.Module,
           optimizer: torch.optim.Optimizer,
           epochs: int,
           device: torch.device):
-  
-  is_better = True
-  prev_loss = [float('inf'), float('inf')]
+    # Send model to target device
+    model.to(device)
 
-  epoch_loss = torch.zeros(epochs)
-  val_loss = torch.zeros(epochs)
-  save_path = "checkpoints"
-  os.makedirs(save_path, exist_ok=True)
-  # start timer for full training
-  #t_start = time.time()
-  # training loop
-  for epoch in range(epochs):
-      # start timer for epoch
-      t_epoch = time.time()
-      print('Epoch {} from {}'.format(epoch+1, epochs))
+    # Create empty results dictionary
+    results = {
+        "train_loss": [],
+        "train_acc": [],
+        "test_loss": [],
+        "test_acc": [],
+    }
 
-      model.train()
-      epoch_loss[epoch] = run_iteration(model=model,
-                                        dataloader=train_dataloader,
+    # Loop through training and testing steps for a number of epochs
+    for epoch in tqdm(range(epochs)):
+        print(f"Epoch: {epoch+1}\n------")
+        train_loss, train_acc = train_step(model=model,
+                                           dataloader=train_dataloader,
+                                           loss_fn=loss_fn,
+                                           optimizer=optimizer,
+                                           device=device)
+        test_loss, test_acc = test_step(model=model,
+                                        dataloader=test_dataloader,
                                         loss_fn=loss_fn,
-                                        optimizer=optimizer,
                                         device=device)
+        
+        # Print out what's happening
+        print(
+            f"Epoch: {epoch+1} | "
+            f"train_loss: {train_loss:.4f} | "
+            f"train_acc: {train_acc:.3f} | "
+            f"test_loss: {test_loss:.4f} | "
+            f"test_acc: {test_acc:.3f}"
+        )
 
-      # Validation
-      model.eval()
-      with torch.inference_mode():
-          val_loss[epoch] = run_iteration(model=model,
-                                          dataloader=test_dataloader,
-                                          loss_fn=loss_fn,
-                                          optimizer=optimizer,
-                                          device=device,
-                                          do_backprob=False)
+        # Update results dictionary
+        results["train_loss"].append(train_loss)
+        results["train_acc"].append(train_acc)
+        results["test_loss"].append(test_loss)
+        results["test_acc"].append(test_acc)
 
-          delta_epoch = time.time() - t_epoch
-
-          # print the current epoch's training and validation mean loss
-          print('[{}] Training loss: {:.4f}'.format(epoch+1, epoch_loss[epoch]))
-          print('[{}] Validation Loss: {:.4f}\t Time: {:.2f}s'.format(epoch+1, val_loss[epoch], delta_epoch))
-
-          # check if current epoch's losses are better then best saved
-          is_better = epoch_loss[epoch] < prev_loss[0] and val_loss[epoch] <= prev_loss[1]
-          if is_better:
-              # update best training and validation losses
-              prev_loss[0] = epoch_loss[epoch]
-              prev_loss[1] = val_loss[epoch]
-              # save best model
-          if epoch > 15:
-              torch.save(model.state_dict(), './checkpoints/isles01.pt')
-              print("\033[91m {}\033[00m" .format("Saved best model"))
-          if epoch > 5 and val_loss[epoch] > 5:
-            break
-  #t_end = time.time()
-  #print('Finished Training in {:.2f} seconds'.format(t_end))
-  #print_train_time(t_start, t_end, device)        
+    # Return the filled results at the end of the epochs
+    return results

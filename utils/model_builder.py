@@ -198,3 +198,37 @@ class UNet(nn.Module):
         """
         n_params = sum(p.numel() for p in self.parameters())
         return n_params
+
+class CustomTinyVGG(nn.Module):
+    """Downscaling with maxpool then double conv"""
+
+    def __init__(self, in_channels, out_channels, mid_channels):
+        super().__init__()
+        self.classifier = nn.Sequential(
+            DoubleConv(in_channels, mid_channels),
+            nn.MaxPool2d(2),
+            DoubleConv(mid_channels, mid_channels),
+            nn.MaxPool2d(2),
+            nn.Flatten(),
+            nn.Linear(in_features=mid_channels, out_features=out_channels)
+        )
+
+    def forward(self, x):
+        return self.classifier(x)
+
+class CustomTinyVGGLazy(nn.Module):
+    """Downscaling with maxpool then double conv"""
+
+    def __init__(self, in_channels, out_channels, mid_channels):
+        super().__init__()
+        self.classifier = nn.Sequential(
+            DoubleConv(in_channels, mid_channels),
+            nn.MaxPool2d(2),
+            DoubleConv(mid_channels, mid_channels),
+            nn.MaxPool2d(2),
+            nn.Flatten(),
+            nn.LazyLinear(out_features=out_channels)
+        )
+
+    def forward(self, x):
+        return self.classifier(x)
