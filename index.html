@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nordstern Reinigung & Transport</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Tailwind's gray-50 */
+        }
+        .service-card {
+            background-color: white;
+            border-radius: 0.75rem; /* 12px */
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .logo-container img {
+            max-width: 100%;
+            height: auto;
+        }
+        .header-bg {
+            background-color: #0d285a; /* A dark blue inspired by the logo */
+        }
+        .section-title {
+            color: #1e3a8a; /* A strong blue from Tailwind's palette */
+        }
+        .cta-button {
+            background-color: #1e3a8a;
+            color: white;
+            transition: background-color 0.3s;
+        }
+        .cta-button:hover {
+            background-color: #1c3473;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- Header Section -->
+    <header class="header-bg text-white p-6 shadow-md">
+        <div class="container mx-auto flex flex-col md:flex-row justify-between items-center text-center md:text-left">
+            <div class="logo-container mb-4 md:mb-0">
+                 <!-- The logo provided by the user -->
+                <img src="https://storage.googleapis.com/maker-studio-project-uploads-prod/uploaded:image.png-609e6afc-6846-4d7b-9672-3a14cab15ce3" alt="Nordstern Logo" class="h-16 mx-auto md:mx-0">
+            </div>
+            <nav>
+                <ul class="flex space-x-6">
+                    <li><a href="#reinigung" class="hover:text-gray-300">Reinigung</a></li>
+                    <li><a href="#transport" class="hover:text-gray-300">Transport</a></li>
+                    <li><a href="#kontakt" class="hover:text-gray-300">Kontakt</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto p-4 md:p-8">
+
+        <!-- Hero Section -->
+        <section class="text-center my-12">
+            <h1 class="text-4xl md:text-5xl font-bold section-title mb-4">Willkommen bei Nordstern</h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">Ihr zuverlässiger Partner für professionelle Reinigungs- und Transportdienstleistungen.</p>
+        </section>
+
+        <!-- Cleaning Services Section -->
+        <section id="reinigung" class="mb-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center mb-8 section-title">Dienstleistungen Reinigung</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Service Card: Büroreinigung -->
+                <div class="service-card p-6">
+                    <h3 class="text-xl font-semibold mb-2">Büroreinigung</h3>
+                    <p class="text-gray-600">Sorgen für eine saubere und repräsentative Arbeitsumgebung.</p>
+                </div>
+                <!-- Service Card: Treppenreinigung -->
+                <div class="service-card p-6">
+                    <h3 class="text-xl font-semibold mb-2">Treppenreinigung</h3>
+                    <p class="text-gray-600">Regelmäßige und gründliche Reinigung von Treppenhäusern.</p>
+                </div>
+                <!-- Service Card: Grundreinigung -->
+                <div class="service-card p-6">
+                    <h3 class="text-xl font-semibold mb-2">Grundreinigung</h3>
+                    <p class="text-gray-600">Intensive Reinigung für besondere Anlässe oder nach Renovierungen.</p>
+                </div>
+                <!-- Service Card: Glasreinigung -->
+                <div class="service-card p-6">
+                    <h3 class="text-xl font-semibold mb-2">Glasreinigung</h3>
+                    <p class="text-gray-600">Streifenfreie Sauberkeit für Fenster und Glasflächen jeder Art.</p>
+                </div>
+                 <!-- Service Card: Gartenpflege -->
+                <div class="service-card p-6">
+                    <h3 class="text-xl font-semibold mb-2">Gartenpflege</h3>
+                    <p class="text-gray-600">Komplette Pflege für private Gärten und gewerbliche Grünanlagen.</p>
+                </div>
+                 <!-- Service Card: Gartenarbeit -->
+                <div class="service-card p-6">
+                    <h3 class="text-xl font-semibold mb-2">Gartenarbeit aller Art</h3>
+                    <ul class="list-disc list-inside text-gray-600 mt-2">
+                        <li>Rasenmähen</li>
+                        <li>Unkraut- und Laubbeseitigung</li>
+                        <li>Und vieles mehr</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Transport Services Section -->
+        <section id="transport" class="mb-16 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center mb-8 section-title">Dienstleistungen Transport (deutschlandweit)</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Service Card: PKW-Überführung -->
+                <div class="service-card p-6">
+                    <h3 class="text-xl font-semibold mb-2">PKW-Überführung</h3>
+                    <p class="text-gray-600">Sicherer und pünktlicher Transport Ihres Personenkraftwagens.</p>
+                </div>
+                <!-- Service Card: NFZ & Wohnmobil -->
+                <div class="service-card p-6">
+                    <h3 class="text-xl font-semibold mb-2">NFZ & Wohnmobil Überführung</h3>
+                    <p class="text-gray-600">Zuverlässige Überführung von Nutzfahrzeugen und Wohnmobilen.</p>
+                </div>
+                 <!-- Service Card: Express-Service -->
+                <div class="service-card p-6">
+                    <h3 class="text-xl font-semibold mb-2">Express-Service</h3>
+                    <p class="text-gray-600">Wenn es besonders schnell gehen muss – unser Express-Transport.</p>
+                </div>
+                 <!-- Service Card: Hol- und Bringservice -->
+                <div class="service-card p-6">
+                    <h3 class="text-xl font-semibold mb-2">Hol- und Bringservice</h3>
+                    <p class="text-gray-600">Bequemer Service für die Abholung und Zustellung Ihrer Güter.</p>
+                </div>
+                <!-- Service Card: Fahrzeugreinigung -->
+                <div class="service-card p-6">
+                    <h3 class="text-xl font-semibold mb-2">Fahrzeugreinigung</h3>
+                    <p class="text-gray-600">Professionelle Reinigung für einen glänzenden Auftritt Ihres Fahrzeugs.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing/Contact Section -->
+        <section id="kontakt" class="text-center bg-white p-8 md:p-12 rounded-lg shadow-lg">
+            <h2 class="text-3xl font-bold mb-4 section-title">Interesse geweckt?</h2>
+            <p class="text-lg text-gray-600 mb-6">Alle Preise erhalten Sie individuell auf Anfrage. Kontaktieren Sie uns für ein unverbindliches Angebot!</p>
+            <!-- A placeholder for a contact button/info -->
+            <a href="mailto:info@nordstern-beispiel.de" class="cta-button font-bold py-3 px-8 rounded-lg text-lg inline-block">
+                Jetzt Anfragen
+            </a>
+            <p class="text-sm text-gray-500 mt-4">(Beispiel-E-Mail)</p>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white text-center p-4 mt-8">
+        <div class="container mx-auto">
+            &copy; 2024 Nordstern Reinigung & Transport. Alle Rechte vorbehalten.
+        </div>
+    </footer>
+
+</body>
+</html>
